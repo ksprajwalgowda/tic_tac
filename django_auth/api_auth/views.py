@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from rest_framework import status
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer , PasswordSerializer
+from .serializers import UserSerializer , PasswordSerializer,UserDetailsSerializer
 
 
 @api_view(['GET'])
@@ -27,7 +27,7 @@ def create_auth(request):
         dic_res = {
             'username':serialized.initial_data['username'],
             'email':serialized.initial_data['email'],
-            'password': serialized.initial_data['password']
+            
         }
         return Response(dic_res, status=status.HTTP_201_CREATED)
     else:
@@ -64,3 +64,27 @@ def set_password(request):
 def logout(request):
     request.user.auth_token.delete()
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_userDetails(request):
+    serializer = UserDetailsSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        res = {'mes':'User details created'}
+        return Response(res,status=status.HTTP_200_OK)
+    return Response(serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST)
+
+#  {
+#     'email':'ksprajwalgowda35@gmail.com',
+#     'username':'prajwal',
+#     'first_name':'prajwal',
+#     'last_name':'gowda',
+#     'dob': '2022-08-22',
+#     'gender': 'male',
+#     'bio':'dasdasdasdsdas',
+#     'phone_no':'9481267125'
+
+# }
